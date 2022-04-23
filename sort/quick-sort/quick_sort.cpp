@@ -17,45 +17,79 @@ using namespace std;
 //6. 将分割后的两个序列继续执行上述相同的操作，递归结束条件是右指针>=左侧指针
 
 template <typename T>
+void wswap(T *data, int index1, int index2) {
+	T tmp = data[index1];
+	data[index1] = data[index2];
+	data[index2] = tmp;
+}
+
+//template <typename T>
+//int partition(T *t, int low, int high) {
+//	//三数取中，选择枢轴,并另左端为枢轴
+//	int m = low + (high - low)/2;
+//	T tmp;
+//	//保证左端较小
+//	if(t[low] > t[high]) {
+//		tmp = t[low];
+//		t[low] = t[high];
+//		t[high] = tmp;
+//	}
+//	//保证中间较小
+//	if(t[m] > t[high]) {
+//		tmp = t[m];
+//		t[m] = t[high];
+//		t[high] = tmp;
+//	}
+//	//两个较小的比较,t[low]取大的,这时t[low]为中间值
+//	if(t[m] > t[low]) {
+//		tmp = t[m];
+//		t[m] = t[low];
+//		t[low] = tmp;
+//	}
+//	T pivotKey = t[low];
+//
+//	while(low<high) {
+//		//从右往左比较
+//		while(low < high && t[high] >= pivotKey) high--;
+//		//交换枢轴
+//		tmp = t[low];
+//		t[low] = t[high];
+//		t[high] = tmp;
+//		//从左往右比较
+//		while(low < high && t[low] <= pivotKey) low++;
+//		//交换枢轴
+//		tmp = t[low];
+//		t[low] = t[high];
+//		t[high] = tmp;
+//	}
+//	return low;
+//}
+
+template <typename T>
 int partition(T *t, int low, int high) {
-	int pivotKey;
+
 	//三数取中，选择枢轴,并另左端为枢轴
 	int m = low + (high - low)/2;
-	T tmp;
 	//保证左端较小
-	if(t[low] > t[high]) {
-		tmp = t[low];
-		t[low] = t[high];
-		t[high] = tmp;
-	}
+	if(t[low] > t[high]) wswap(t, low, high);
 	//保证中间较小
-	if(t[m] > t[high]) {
-		tmp = t[m];
-		t[m] = t[high];
-		t[high] = tmp;
-	}
+	if(t[m] > t[high]) wswap(t, m, high);
 	//两个较小的比较,t[low]取大的,这时t[low]为中间值
-	if(t[m] > t[low]) {
-		tmp = t[m];
-		t[m] = t[low];
-		t[low] = tmp;
-	}
-	pivotKey = t[low];
+	if(t[m] > t[low]) wswap(t, m, low);
 
+	T keyPivot = t[low];
+	
 	while(low<high) {
 		//从右往左比较
-		while(low < high && t[high] >= pivotKey) high--;
-		//交换枢轴
-		tmp = t[low];
-		t[low] = t[high];
-		t[high] = tmp;
+		while(low < high && t[high] >= keyPivot) high--;
+		//交换枢轴,注意交换后枢轴跑到右侧了
+		wswap(t, low, high);
 		//从左往右比较
-		while(low < high && t[low] < pivotKey) low++;
-		//交换枢轴
-		tmp = t[low];
-		t[low] = t[high];
-		t[high] = tmp;
+		while(low < high && t[low] <= keyPivot) low++;
+		//交换枢轴,注意交换后枢轴又跑到左侧了
+		wswap(t, low, high);
 	}
+
 	return low;
 }
 	
@@ -71,8 +105,10 @@ void quickSort(T *t, int low, int high) {
 }
 
 int main(int argc, char **argv) {
-	int array[] = {27,100,22,5,88};
-	cout << "array = {27,100,22,5,88}, quickSort..." << endl;
+	//int array[] = {100,99,88,77,66};
+	//cout << "array = {100,99,88,77,66}, quickSort..." << endl;
+	int array[] = {27,100,22,5,88,77,66};
+	cout << "array = {27,100,22,5,88,77,66}, quickSort..." << endl;
 	int len = sizeof(array)/sizeof(int);
 	quickSort(array, 0, len-1);
 	cout << "array = : " << endl;
