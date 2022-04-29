@@ -1,3 +1,51 @@
+void nv21_to_rgb(unsigned char *nv21, int w, int h, unsigned char **rgb) {
+	if(*rgb == nullptr) {
+		*rgb = (unsigned char *)malloc(w*h*3);
+		memset(*rgb, 0, w*h*3);
+	}
+
+	//y、v位置
+	unsigned char *yp = nv21;
+	unsigned char *vp = nv21 + w*h;
+
+	unsigned char *rgb_p = *rgb;
+	int y,u,v;
+	int count = 0;
+
+	for(int i=0; i<w*h; i++) {
+		y = *yp;
+		u = *(vp+1);
+		v = *vp;
+
+		//每次循环y向前走一步
+		yp += 1;    
+		//y每走四步，vp走两步，即四个y对应一组vu
+		if(++count == 4) {
+			vp += 2;
+			count = 0;
+		}
+
+		//yuv公式转换并归一化到0-255
+                int R = y + ((360 * (v - 128))>>8) ;
+                int G = y - ((( 88 * (u - 128)  + 184 * (v - 128)))>>8) ;
+                int B = y +((455 * (u - 128))>>8) ;
+                R = (unsigned char) (R > 255 ? 255 : (R < 0 ? 0 : R));
+                G = (unsigned char) (G > 255 ? 255 : (G < 0 ? 0 : G));
+                B = (unsigned char) (B > 255 ? 255 : (B < 0 ? 0 : B));
+
+		rgb_p[0] = R;
+		rgb_p[1] = G;
+		rgb_p[2] = B;
+		rgb_p += 3;
+	}
+}
+
+
+
+		
+
+
+
 /**
  * NV21转RGB,这是根据NV21数据结构和存储方式自己写的算法
  * @param nv21
